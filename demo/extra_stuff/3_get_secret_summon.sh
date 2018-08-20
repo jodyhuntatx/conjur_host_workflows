@@ -13,8 +13,8 @@ set -eo pipefail
 # - write the processed text to a file called temp.out. 
 
 # get pointers to Conjur api and SSL certificate
-export CONJUR_APPLIANCE_URL=https://conjur-master:$MASTER_NODE_PORT/api
-export CONJUR_CERT_FILE=/root/conjur-$CONJUR_ACCOUNT.pem
+export CONJUR_APPLIANCE_URL=$OPENSHIFT_IP/api
+export CONJUR_CERT_FILE=/etc/conjur-$CONJUR_ACCOUNT.pem
 
 # other env vars needed by summon/summon-conjur
 export CONJUR_MAJOR_VERSION=4

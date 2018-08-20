@@ -1,8 +1,12 @@
-#!/bin/bash
+#!/bin/bash 
+
+. utils.sh
+
+set_namespace $CONJUR_NAMESPACE_NAME
+
+CONJUR_MASTER_ROUTE=$($cli get routes | grep conjur-master | awk '{ print $2 }')
+OPENSHIFT_IP="https://$CONJUR_MASTER_ROUTE"
 DEMO_CLIENT=demo-client
-OPENSHIFT_IP=$(minishift ip)
-MASTER_NODE_PORT=30443
-FOLLOWER_NODE_PORT=30444
 
 echo "Starting demo container..."
 docker run \
@@ -10,8 +14,6 @@ docker run \
   --entrypoint sh \
   --name $DEMO_CLIENT \
   --env OPENSHIFT_IP=$OPENSHIFT_IP \
-  --env MASTER_NODE_PORT=$MASTER_NODE_PORT \
-  --env FOLLOWER_NODE_PORT=$FOLLOWER_NODE_PORT \
   --env CONJUR_ACCOUNT=$CONJUR_ACCOUNT \
   cyberark/conjur-cli:4-latest \
   -c "sleep infinity" &

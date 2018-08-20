@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # get pointers to Conjur api and SSL certificate
-export CONJUR_APPLIANCE_URL=https://conjur-master:$MASTER_NODE_PORT/api
-export CONJUR_CERT_FILE=/root/conjur-$CONJUR_ACCOUNT.pem
+export CONJUR_APPLIANCE_URL=$OPENSHIFT_IP/api
+export CONJUR_CERT_FILE=/etc/conjur-$CONJUR_ACCOUNT.pem
 
 ### HARD CODED VALUES ###
 declare HOST_FACTORY_NAME=webapp1/tomcat_factory

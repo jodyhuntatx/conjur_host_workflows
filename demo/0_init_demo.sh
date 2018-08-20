@@ -2,13 +2,13 @@
 APP_HOSTNAME=webapp1/tomcat_host
 
 # add subject alt names for Openshift IP address
-echo "$OPENSHIFT_IP	conjur-master conjur-follower" >> /etc/hosts
+#echo "$OPENSHIFT_IP	conjur-master conjur-follower" >> /etc/hosts
 
 # delete old identity stuff
 rm -f /root/.conjurrc /root/conjur*.pem
 
 # initialize client environment
-conjur init -h conjur-master:$MASTER_NODE_PORT << EOF
+conjur init -h $OPENSHIFT_IP << EOF
 yes
 EOF
 conjur plugin install policy
@@ -26,7 +26,7 @@ api_key=$(conjur host rotate_api_key --host $APP_HOSTNAME)
 				# copy over identity file
 echo "Generating identity file..."
 cat <<IDENTITY_EOF | tee /etc/conjur.identity
-machine https://conjur-master:$MASTER_NODE_PORT/api/authn
+machine $OPENSHIFT_IP/api/authn
   login host/$APP_HOSTNAME
   password $api_key
 IDENTITY_EOF
@@ -35,12 +35,14 @@ echo
 echo "Generating host configuration file..."
 cat <<CONF_EOF | tee /etc/conjur.conf
 ---
-appliance_url: https://conjur-master:$MASTER_NODE_PORT/api
+appliance_url: $OPENSHIFT_IP/api
 account: $CONJUR_ACCOUNT
 netrc_path: "/etc/conjur.identity"
 cert_file: "/etc/conjur-$CONJUR_ACCOUNT.pem"
 plugins: [ policy ]
 CONF_EOF
+
+chmod go-rw /etc/conjur.identity
 
 # delete user identity files to force use of /etc/conjur* host identity files.
 rm ~/.conjurrc ~/.netrc

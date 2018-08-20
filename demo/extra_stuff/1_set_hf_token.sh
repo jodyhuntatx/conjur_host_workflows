@@ -1,17 +1,19 @@
 #!/bin/bash 
 #
-# This script simulates the role of a security administrator that creates and distributes Host Factory tokens.
+# Admin_process - simulates the role of a security administrator that creates and distributes Host Factory tokens 
 #
+# Usage: admin_process <host-factory-name> <host-name> <variable-to-fetch>
+
+# get pointers to Conjur REST API endpoint and SSL certificate
+export CONJUR_APPLIANCE_URL=$OPENSHIFT_IP/api
+export CONJUR_CERT_FILE=/etc/conjur-$CONJUR_ACCOUNT.pem
+
 #####
 # HARD CODED VALUES from ../webapp1-policy.yml in parent directory
 declare HOST_FACTORY_NAME=webapp1/tomcat_factory
 declare HOST_NAME=tomcat_host_from_hf_token
 declare VAR_ID=webapp1/database_password 
 ######
-
-# get pointers to Conjur REST API endpoint and SSL certificate
-export CONJUR_APPLIANCE_URL=https://conjur-master:$MASTER_NODE_PORT/api
-export CONJUR_CERT_FILE=/etc/conjur-$CONJUR_ACCOUNT.pem
 
 # data specs and time math are not portable - set DATE_SPEC to the correct platform
 readonly MAC_DATE='date -v+"$dur_time_secs"S +%Y-%m-%dT%H%%3A%M%%3A%S%z'
@@ -28,35 +30,6 @@ declare DEBUG_BREAKPT="read -n 1 -s -p 'Press any key to continue'"
 declare ADMIN_SESSION_TOKEN
 declare CONJUR_HOST_FACTORY_TOKEN
 declare URLIFIED
-
-################  MAIN   ################
-# $1 - name of output file
-main() {
-
-        if [[ $# -ne 1 ]] ; then
-                printf "\n\tUsage: %s <output-filename>\n\n" $0
-                exit 1
-        fi
-        local output_file=$1
-
-	# authenticate (login) user
-	user_authn  # get admin session token based on user name and password
-
-	urlify $HOST_FACTORY_NAME
-	HOST_FACTORY_NAME=$URLIFIED
-	
-	hf_show $HOST_FACTORY_NAME
-	# create a host factory token
-	hf_token_create $HOST_FACTORY_NAME 200000
-	printf "\nHF token is: %s\n" $CONJUR_HOST_FACTORY_TOKEN
-	hf_show $HOST_FACTORY_NAME
-
-	# write out host factory token, host name and variable name to file
-	echo $CONJUR_HOST_FACTORY_TOKEN > $output_file
-	echo $HOST_NAME >> $output_file
-	echo $VAR_ID >> $output_file
-	printf "\n\nWrote HF token, app name and variable name to file '%s'...\n\n\n" $output_file
-}
 
 ##################
 # USER AUTHN - get admin session token based on user name and password
@@ -95,7 +68,7 @@ urlify() {
 	URLIFIED=$str
 }
 
-##################
+################  MAIN   ################
 # HOST FACTORY TOKEN CREATE a new HF token with a defined expiration date
 # $1 - host factory id
 # $2 - dur time - hf token lifespan in seconds
@@ -144,6 +117,35 @@ hf_token_revoke() {
          -H "Content-Type: application/json" \
          -H "Authorization: Token token=\"$ADMIN_SESSION_TOKEN\"" \
          $CONJUR_APPLIANCE_URL/host_factories/tokens/$hf_token
+}
+
+################  MAIN   ################
+# $1 - name of output file
+main() {
+
+        if [[ $# -ne 1 ]] ; then
+                printf "\n\tUsage: %s <output-filename>\n\n" $0
+                exit 1
+        fi
+        local output_file=$1
+
+	# authenticate (login) user
+	user_authn  # get admin session token based on user name and password
+
+	urlify $HOST_FACTORY_NAME
+	HOST_FACTORY_NAME=$URLIFIED
+	
+	hf_show $HOST_FACTORY_NAME
+	# create a host factory token
+	hf_token_create $HOST_FACTORY_NAME 200000
+	printf "\nHF token is: %s\n" $CONJUR_HOST_FACTORY_TOKEN
+	hf_show $HOST_FACTORY_NAME
+
+	# write out host factory token, host name and variable name to file
+	echo $CONJUR_HOST_FACTORY_TOKEN > $output_file
+	echo $HOST_NAME >> $output_file
+	echo $VAR_ID >> $output_file
+	printf "\n\nWrote HF token, app name and variable name to file '%s'...\n\n\n" $output_file
 }
 
 main "$@"
