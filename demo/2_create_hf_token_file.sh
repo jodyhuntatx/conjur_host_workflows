@@ -37,6 +37,10 @@ main() {
                 printf "\n\tUsage: %s <output-filename>\n\n" $0
                 exit 1
         fi
+
+	echo "This script generates a host factory token and writes it to the filename provide"
+	echo "along with a proposed hostname and variable name. This information"
+	echo "is used as input to the next script."
         local output_file=$1
 
 	# authenticate (login) user

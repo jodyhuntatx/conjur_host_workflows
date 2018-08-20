@@ -4,6 +4,8 @@ if [[ "$1" == "" ]]; then
   exit -1
 fi
 
+echo "This script dynamically creates a new identity in Conjur and"
+echo "updates the /etc/conjur.identity file."
 INPUT_FILE=$1
 i=1
 while read line
