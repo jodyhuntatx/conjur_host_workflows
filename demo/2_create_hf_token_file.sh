@@ -10,7 +10,7 @@ declare VAR_ID=webapp1/database_password
 ######
 
 # get pointers to Conjur REST API endpoint and SSL certificate
-export CONJUR_APPLIANCE_URL=$OPENSHIFT_IP/api
+export CONJUR_APPLIANCE_URL=$CONJUR_MASTER_URL/api
 export CONJUR_CERT_FILE=/etc/conjur-$CONJUR_ACCOUNT.pem
 
 # data specs and time math are not portable - set DATE_SPEC to the correct platform

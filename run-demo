@@ -5,7 +5,7 @@
 set_namespace $CONJUR_NAMESPACE_NAME
 
 CONJUR_MASTER_ROUTE=$($cli get routes | grep conjur-master | awk '{ print $2 }')
-OPENSHIFT_IP="https://$CONJUR_MASTER_ROUTE"
+CONJUR_MASTER_URL="https://$CONJUR_MASTER_ROUTE"
 DEMO_CLIENT=demo-client
 
 echo "Starting demo container..."
@@ -13,7 +13,7 @@ docker run \
   -v $(pwd)/demo:/demo \
   --entrypoint sh \
   --name $DEMO_CLIENT \
-  --env OPENSHIFT_IP=$OPENSHIFT_IP \
+  --env CONJUR_MASTER_URL=$CONJUR_MASTER_URL \
   --env CONJUR_ACCOUNT=$CONJUR_ACCOUNT \
   cyberark/conjur-cli:4-latest \
   -c "sleep infinity" &

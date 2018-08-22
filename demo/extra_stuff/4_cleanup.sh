@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # get pointers to Conjur api and SSL certificate
-export CONJUR_APPLIANCE_URL=$OPENSHIFT_IP/api
+export CONJUR_APPLIANCE_URL=$CONJUR_MASTER_URL/api
 export CONJUR_CERT_FILE=/etc/conjur-$CONJUR_ACCOUNT.pem
 
 ### HARD CODED VALUES ###

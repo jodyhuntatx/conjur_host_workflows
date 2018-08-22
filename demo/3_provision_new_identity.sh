@@ -27,7 +27,7 @@ done < "$INPUT_FILE"
 rm -f /root/.conjurrc /root/conjur*.pem /etc/conjur*
 
 # initialize client environment
-conjur init -h $OPENSHIFT_IP << EOF
+conjur init -h $CONJUR_MASTER_URL << EOF
 yes
 EOF
 conjur plugin install policy
@@ -42,7 +42,7 @@ api_key=$(conjur hostfactory hosts create $HF_TOKEN $APP_HOSTNAME | jq -r .api_k
 				# copy over identity file
 echo "Generating identity file..."
 cat <<IDENTITY_EOF | tee /etc/conjur.identity
-machine $OPENSHIFT_IP/api/authn
+machine $CONJUR_MASTER_URL/api/authn
   login host/$APP_HOSTNAME
   password $api_key
 IDENTITY_EOF
@@ -52,7 +52,7 @@ echo
 echo "Generating host configuration file..."
 cat <<CONF_EOF | tee /etc/conjur.conf
 ---
-appliance_url: $OPENSHIFT_IP/api
+appliance_url: $CONJUR_MASTER_URL/api
 account: $CONJUR_ACCOUNT
 netrc_path: "/etc/conjur.identity"
 cert_file: "/etc/conjur-$CONJUR_ACCOUNT.pem"
